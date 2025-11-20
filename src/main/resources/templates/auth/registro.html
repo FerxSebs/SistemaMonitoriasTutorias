@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Sistema de Tutorías</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+          rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" 
+          crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/styless.css}" rel="stylesheet" type="text/css">
+</head>
+<body class="register-page">
+    <div class="container">
+        <div class="register-container">
+            <div class="register-card">
+                <div class="register-header">
+                    <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="Logo UTS" class="register-logo">
+                    <h1 class="register-title">Crear Cuenta</h1>
+                    <p class="register-subtitle">Regístrate para acceder al sistema</p>
+                </div>
+
+                <!-- Mensajes de error/éxito -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show alert-custom" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <form th:action="@{/registro}" th:object="${estudiante}" method="post">
+                    <!-- ID del Estudiante - Campo completo -->
+                    <div class="mb-4">
+                        <label for="idEstudiante" class="form-label required">CC del Estudiante</label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="idEstudiante" 
+                               th:field="*{idEstudiante}"
+                               placeholder="Ingrese su número de identificación de estudiante (ej: 123456789)"
+                               required
+                               min="1">
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Ingrese su número de identificación 
+                        </div>
+                        <div th:if="${#fields.hasErrors('idEstudiante')}" class="invalid-feedback d-block" th:errors="*{idEstudiante}"></div>
+                    </div>
+                    
+                    <!-- Nombre y Apellido -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="nombre" class="form-label required">Nombre</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre" 
+                                   th:field="*{nombre}"
+                                   placeholder="Ingrese su nombre completo"
+                                   required>
+                            <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback d-block" th:errors="*{nombre}"></div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="apellido" class="form-label required">Apellido</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="apellido" 
+                                   th:field="*{apellido}"
+                                   placeholder="Ingrese su apellido completo"
+                                   required>
+                            <div th:if="${#fields.hasErrors('apellido')}" class="invalid-feedback d-block" th:errors="*{apellido}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Correo Electrónico - Campo completo -->
+                    <div class="mb-4">
+                        <label for="correo" class="form-label required">Correo Electrónico</label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="correo" 
+                               th:field="*{correo}"
+                               placeholder="correo.electronico@ejemplo.com"
+                               required>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-envelope me-1"></i>
+                            Este correo será usado para iniciar sesión en el sistema
+                        </div>
+                        <div th:if="${#fields.hasErrors('correo')}" class="invalid-feedback d-block" th:errors="*{correo}"></div>
+                    </div>
+                    
+                    <!-- Teléfono y Programa Académico -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="telefono" 
+                                   th:field="*{telefono}"
+                                   placeholder="Ej: +57 300 123 4567 o 3001234567">
+                            <div class="form-text mt-2">
+                                <i class="fas fa-phone me-1"></i>
+                                Número de contacto (opcional)
+                            </div>
+                            <div th:if="${#fields.hasErrors('telefono')}" class="invalid-feedback d-block" th:errors="*{telefono}"></div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="programaAcademico" class="form-label">Programa Académico</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="programaAcademico" 
+                                   th:field="*{programaAcademico}"
+                                   placeholder="Ej: Ingeniería de Sistemas, Administración de Empresas">
+                            <div class="form-text mt-2">
+                                <i class="fas fa-graduation-cap me-1"></i>
+                                Programa de estudios (opcional)
+                            </div>
+                            <div th:if="${#fields.hasErrors('programaAcademico')}" class="invalid-feedback d-block" th:errors="*{programaAcademico}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contraseña - Campo completo -->
+                    <div class="mb-4">
+                        <label for="password" class="form-label required">Contraseña</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               th:field="*{password}"
+                               placeholder="Ingrese una contraseña segura"
+                               required
+                               minlength="6">
+                        <div class="form-text mt-2">
+                            <i class="fas fa-lock me-1"></i>
+                            La contraseña debe tener al menos 6 caracteres. Se recomienda usar una combinación de letras, números y caracteres especiales.
+                        </div>
+                        <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback d-block" th:errors="*{password}"></div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-register">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Registrarse
+                        </button>
+                    </div>
+                </form>
+
+                <div class="login-link">
+                    <p class="mb-0">
+                        ¿Ya tienes una cuenta? 
+                        <a th:href="@{/login}">Inicia sesión aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
+

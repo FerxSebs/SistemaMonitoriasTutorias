@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Sistema de Tutorías y Monitorías</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+          rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" 
+          crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/styless.css}" rel="stylesheet" type="text/css">
+    <style>
+        /* Estilos específicos de la página home */
+        .welcome-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: var(--dark-text);
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar('Panel Principal')}"></div>
+
+    <!-- Main Content -->
+    <div class="container main-container">
+        <!-- Panel de Administrador -->
+        <div sec:authorize="hasRole('ADMIN')">
+            <div class="welcome-section">
+                <h1 class="welcome-title">Panel de Administración</h1>
+                <p class="welcome-subtitle">
+                    <span sec:authentication="name"></span>, gestiona todos los módulos del sistema
+                </p>
+            </div>
+
+            <div class="admin-cards-grid">
+                <a href="/views/estudiantes/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3 class="admin-card-title">Estudiantes</h3>
+                    <p class="admin-card-description">Gestiona la información de los estudiantes del sistema</p>
+                </a>
+
+                <a href="/views/profesores/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3 class="admin-card-title">Profesores</h3>
+                    <p class="admin-card-description">Administra los profesores y sus datos</p>
+                </a>
+
+                <a href="/views/tutores/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3 class="admin-card-title">Tutores</h3>
+                    <p class="admin-card-description">Gestiona los tutores del sistema</p>
+                </a>
+
+                <a href="/views/monitores/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="admin-card-title">Monitores</h3>
+                    <p class="admin-card-description">Administra los monitores disponibles</p>
+                </a>
+
+                <a href="/views/materias/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="admin-card-title">Materias</h3>
+                    <p class="admin-card-description">Gestiona las materias y sus valores por hora</p>
+                </a>
+
+                <a href="/views/tutorias/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="admin-card-title">Tutorías</h3>
+                    <p class="admin-card-description">Visualiza y gestiona todas las tutorías</p>
+                </a>
+
+                <a href="/views/monitorias/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-chalkboard"></i>
+                    </div>
+                    <h3 class="admin-card-title">Monitorías</h3>
+                    <p class="admin-card-description">Administra todas las monitorías del sistema</p>
+                </a>
+
+                <a href="/views/facturas/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3 class="admin-card-title">Facturas</h3>
+                    <p class="admin-card-description">Visualiza y filtra las facturas por monitor</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Panel de Estudiante -->
+        <div sec:authorize="hasRole('ESTUDIANTE') and !hasRole('MONITOR')">
+            <div class="welcome-section">
+                <h1 class="welcome-title">Bienvenido Estudiante</h1>
+                <p class="welcome-subtitle">
+                    <span sec:authentication="name"></span>, gestiona tus tutorías y monitorías
+                </p>
+            </div>
+            <div class="admin-cards-grid">
+                <a href="/estudiante/tutorias/nuevo" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h3 class="admin-card-title">Crear Tutoría</h3>
+                    <p class="admin-card-description">Solicita una nueva tutoría</p>
+                </a>
+                <a href="/estudiante/monitorias/nuevo" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h3 class="admin-card-title">Crear Monitoría</h3>
+                    <p class="admin-card-description">Solicita una nueva monitoría</p>
+                </a>
+                <a href="/estudiante/tutorias/mis-tutorias" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="admin-card-title">Mis Tutorías</h3>
+                    <p class="admin-card-description">Visualiza tus tutorías</p>
+                </a>
+                <a href="/estudiante/monitorias/mis-monitorias" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-chalkboard"></i>
+                    </div>
+                    <h3 class="admin-card-title">Mis Monitorías</h3>
+                    <p class="admin-card-description">Visualiza tus monitorías</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Panel de Monitor -->
+        <div sec:authorize="hasRole('MONITOR')">
+            <div class="welcome-section">
+                <h1 class="welcome-title">Panel de Monitor</h1>
+                <p class="welcome-subtitle">
+                    <span sec:authentication="name"></span>, gestiona tus monitorías y facturación
+                </p>
+            </div>
+            <div class="admin-cards-grid">
+                <a href="/monitor/monitorias/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-chalkboard"></i>
+                    </div>
+                    <h3 class="admin-card-title">Monitorías a Cargo</h3>
+                    <p class="admin-card-description">Gestiona las monitorías asignadas</p>
+                </a>
+                <a href="/monitor/facturacion/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3 class="admin-card-title">Facturación</h3>
+                    <p class="admin-card-description">Consulta tu facturación por período</p>
+                </a>
+                <a href="/monitor/tutorias/mis-tutorias" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="admin-card-title">Mis Tutorías</h3>
+                    <p class="admin-card-description">Tutorías que has solicitado</p>
+                </a>
+                <a href="/monitor/monitorias/mis-monitorias" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <h3 class="admin-card-title">Mis Monitorías</h3>
+                    <p class="admin-card-description">Monitorías que has solicitado</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Panel de Profesor -->
+        <div sec:authorize="hasRole('PROFESOR') and !hasRole('TUTOR')">
+            <div class="welcome-section">
+                <h1 class="welcome-title">Bienvenido Profesor</h1>
+                <p class="welcome-subtitle">
+                    <span sec:authentication="name"></span>, visualiza las materias asignadas
+                </p>
+            </div>
+            <div class="admin-cards-grid">
+                <a href="/profesor/materias/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="admin-card-title">Materias Asignadas</h3>
+                    <p class="admin-card-description">Visualiza las materias que tienes asignadas</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Panel de Tutor -->
+        <div sec:authorize="hasRole('TUTOR')">
+            <div class="welcome-section">
+                <h1 class="welcome-title">Panel de Tutor</h1>
+                <p class="welcome-subtitle">
+                    <span sec:authentication="name"></span>, gestiona las tutorías asignadas
+                </p>
+            </div>
+            <div class="admin-cards-grid">
+                <a href="/tutor/tutorias/" class="admin-card">
+                    <div class="admin-card-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="admin-card-title">Tutorías Asignadas</h3>
+                    <p class="admin-card-description">Visualiza y gestiona las tutorías que te han sido asignadas</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 Sistema de Tutorías y Monitorías. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animaciones de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.admin-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

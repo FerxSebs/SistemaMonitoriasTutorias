@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Totalización de Facturas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/styless.css}" rel="stylesheet" type="text/css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            min-height: calc(100vh - 120px);
+            padding: 1.5rem 0;
+        }
+
+        .header-section {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: none;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background: var(--gradient-primary);
+            color: white;
+            border-bottom: none;
+            padding: 1rem 1.5rem;
+        }
+
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #212529 !important;
+            color: white !important;
+            font-weight: 600;
+            padding: 1rem 0.75rem;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .table thead {
+            background-color: #212529;
+        }
+
+        /* Estilos del Navbar del Administrador */
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            max-width: fit-content;
+            flex-shrink: 0;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+            color: #f8f9fa !important;
+        }
+        
+        .navbar-brand span {
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            min-width: 150px;
+            display: inline-block;
+        }
+
+        .nav-link-custom {
+            color: white !important;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem !important;
+            margin: 0 0.25rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-link-custom:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            color: white !important;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 250px;
+            max-width: 400px;
+            flex-shrink: 0;
+        }
+
+        .logo-img {
+            width: 50%;
+            height: 50px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .total-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar del Administrador -->
+    <div th:replace="~{fragments/navbar :: navbar('Totalización de Facturas')}"></div>
+
+    <!-- Main Content -->
+    <div class="container main-container">
+        <!-- Variables para construir URL -->
+        <th:block th:with="fechaInicioStr=${fechaInicio != null ? #temporals.format(fechaInicio, 'yyyy-MM-dd') : ''}, fechaFinStr=${fechaFin != null ? #temporals.format(fechaFin, 'yyyy-MM-dd') : ''}, urlVolver=${(fechaInicio != null && fechaFin != null) ? ('/views/facturas/?fechaInicio=' + fechaInicioStr + '&fechaFin=' + fechaFinStr + (filtroMonitor != null && filtroMonitor > 0 ? '&idMonitor=' + filtroMonitor : '')) : '/views/facturas/'}">
+            <!-- Header Section -->
+            <div class="header-section text-center">
+                <h1><i class="fas fa-calculator me-2"></i>Totalización de Facturas</h1>
+                <p>Resumen detallado de facturas según los filtros aplicados</p>
+                <p class="mb-0" th:if="${fechaInicio != null && fechaFin != null}">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Período de Monitorías: <strong th:text="${#temporals.format(fechaInicio, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(fechaFin, 'dd/MM/yyyy')}"></strong>
+                </p>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="mb-3">
+                <a th:href="${urlVolver}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a Lista
+                </a>
+                <button onclick="window.print()" class="btn btn-info text-white ms-2">
+                    <i class="fas fa-print me-2"></i>Imprimir
+                </button>
+            </div>
+        </th:block>
+
+        <!-- Resumen General -->
+        <div class="summary-card" th:if="${totalesGenerales != null}">
+            <div class="row">
+                <div class="col-md-3 summary-item">
+                    <div class="summary-value" th:text="${totalesGenerales.cantidadFacturas}"></div>
+                    <div class="summary-label">Facturas</div>
+                </div>
+                <div class="col-md-3 summary-item">
+                    <div class="summary-value" th:text="${totalesGenerales.cantidadMonitores}"></div>
+                    <div class="summary-label">Monitores</div>
+                </div>
+                <div class="col-md-3 summary-item">
+                    <div class="summary-value" th:text="${#numbers.formatDecimal(totalesGenerales.totalHoras, 1, 2)}"></div>
+                    <div class="summary-label">Horas Totales</div>
+                </div>
+                <div class="col-md-3 summary-item">
+                    <div class="summary-value" th:text="'$' + ${#numbers.formatDecimal(totalesGenerales.totalTotal, 0, 2)}"></div>
+                    <div class="summary-label">Total General</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Totales por Monitor -->
+        <div class="card" th:if="${totalesPorMonitor != null && !totalesPorMonitor.isEmpty()}">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Totales por Monitor
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">Monitor</th>
+                                <th scope="col">Cantidad Facturas</th>
+                                <th scope="col">Total Horas</th>
+                                <th scope="col">Subtotal</th>
+                                <th scope="col">IVA</th>
+                                <th scope="col">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="entry : ${totalesPorMonitor}">
+                                <td th:text="${entry.value.nombreMonitor}"></td>
+                                <td th:text="${entry.value.cantidad}"></td>
+                                <td th:text="${#numbers.formatDecimal(entry.value.horas, 1, 2)} + ' horas'"></td>
+                                <td th:text="'$' + ${#numbers.formatDecimal(entry.value.subtotal, 0, 2)}"></td>
+                                <td th:text="'$' + ${#numbers.formatDecimal(entry.value.iva, 0, 2)}"></td>
+                                <td><strong th:text="'$' + ${#numbers.formatDecimal(entry.value.total, 0, 2)}"></strong></td>
+                            </tr>
+                        </tbody>
+                        <tfoot th:if="${totalesGenerales != null}">
+                            <tr class="table-info">
+                                <th>Total General</th>
+                                <th th:text="${totalesGenerales.cantidadFacturas}"></th>
+                                <th th:text="${#numbers.formatDecimal(totalesGenerales.totalHoras, 1, 2)} + ' horas'"></th>
+                                <th th:text="'$' + ${#numbers.formatDecimal(totalesGenerales.totalSubtotal, 0, 2)}"></th>
+                                <th th:text="'$' + ${#numbers.formatDecimal(totalesGenerales.totalIva, 0, 2)}"></th>
+                                <th><strong th:text="'$' + ${#numbers.formatDecimal(totalesGenerales.totalTotal, 0, 2)}"></strong></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalle de Facturas -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Detalle de Facturas
+                    <span class="badge bg-light text-dark ms-2" th:text="${#lists.size(facturas)} + ' facturas'"></span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">N° Factura</th>
+                                <th scope="col">Monitor</th>
+                                <th scope="col">Estudiante</th>
+                                <th scope="col">Materia</th>
+                                <th scope="col">Fecha Emisión</th>
+                                <th scope="col">Horas</th>
+                                <th scope="col">Valor/Hora</th>
+                                <th scope="col">Subtotal</th>
+                                <th scope="col">IVA</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(facturas)}">
+                                <td colspan="12" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                    No se encontraron facturas en el período seleccionado
+                                </td>
+                            </tr>
+                            <tr th:each="factura : ${facturas}">
+                                <td th:text="${factura.numeroFactura}"></td>
+                                <td>
+                                    <span th:if="${factura.monitoria != null && factura.monitoria.monitor != null && factura.monitoria.monitor.estudiante != null}"
+                                          th:text="${factura.monitoria.monitor.estudiante.nombre + ' ' + factura.monitoria.monitor.estudiante.apellido}">
+                                    </span>
+                                    <span th:if="${factura.monitoria == null || factura.monitoria.monitor == null}">N/A</span>
+                                </td>
+                                <td>
+                                    <span th:if="${factura.monitoria != null && factura.monitoria.estudiante != null}"
+                                          th:text="${factura.monitoria.estudiante.nombre + ' ' + factura.monitoria.estudiante.apellido}">
+                                    </span>
+                                    <span th:if="${factura.monitoria == null || factura.monitoria.estudiante == null}">N/A</span>
+                                </td>
+                                <td>
+                                    <span th:if="${factura.monitoria != null && factura.monitoria.materia != null}"
+                                          th:text="${factura.monitoria.materia.nombre}">
+                                    </span>
+                                    <span th:if="${factura.monitoria == null || factura.monitoria.materia == null}">N/A</span>
+                                </td>
+                                <td th:text="${#temporals.format(factura.fechaEmision, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#numbers.formatDecimal(factura.horas, 1, 2)}"></td>
+                                <td th:text="'$' + ${#numbers.formatDecimal(factura.valorPorHora, 0, 2)}"></td>
+                                <td th:text="'$' + ${#numbers.formatDecimal(factura.subtotal, 0, 2)}"></td>
+                                <td th:text="'$' + ${#numbers.formatDecimal(factura.iva, 0, 2)}"></td>
+                                <td><strong th:text="'$' + ${#numbers.formatDecimal(factura.total, 0, 2)}"></strong></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${factura.estado == 'Pendiente'} ? 'bg-warning text-dark' : 
+                                                          (${factura.estado == 'Pagada'} ? 'bg-success' : 'bg-danger')"
+                                          th:text="${factura.estado}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/views/facturas/detalle/{id}(id=${factura.idFactura})}" 
+                                       class="btn btn-sm btn-info text-white">
+                                        <i class="fas fa-eye me-1"></i>Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen Financiero Final -->
+        <div class="card" th:if="${totalesGenerales != null}">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-money-bill-wave me-2"></i>Resumen Financiero
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="text-muted">Subtotal General:</label>
+                            <div class="h4" th:text="'$' + ${#numbers.formatDecimal(totalesGenerales.totalSubtotal, 0, 2)}"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">IVA (19%):</label>
+                            <div class="h4" th:text="'$' + ${#numbers.formatDecimal(totalesGenerales.totalIva, 0, 2)}"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="total-section">
+                            <div class="text-center">
+                                <div class="mb-2">Total a Pagar</div>
+                                <div class="total-amount" th:text="'$' + ${#numbers.formatDecimal(totalesGenerales.totalTotal, 0, 2)}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Sistema de Tutorías y Monitorías - UTS. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            max-width: fit-content;
+            flex-shrink: 0;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+            color: #f8f9fa !important;
+        }
+        
+
+        .nav-link-custom {
+            color: white !important;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem !important;
+            margin: 0 0.25rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-link-custom:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            color: white !important;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 250px;
+            max-width: 400px;
+            flex-shrink: 0;
+        }
+
+        .logo-img {
+            width: 50%;
+            height: 50px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .navbar-brand span {
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            min-width: 150px;
+            display: inline-block;
+        }
+        
+        .navbar {
+            position: relative;
+            z-index: 1000;
+            overflow: visible;
+        }
+        
+        .navbar-custom {
+            position: relative;
+            z-index: 1000;
+            overflow: visible;
+        }
+        
+        .navbar .container {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .role-admin {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-item {
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fragmento de Navbar para Administrador -->
+    <nav th:fragment="navbar-admin(titulo)" class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <!-- Logo y Título de la Vista -->
+            <a class="navbar-brand logo-container" href="/home">
+                <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="Logo UTS" class="logo-img">
+                <span th:text="${titulo}">Sistema de Tutorías</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Menú Usuarios -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link-custom dropdown-toggle" href="#" id="usuariosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-users me-2"></i>Usuarios
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="usuariosDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/views/estudiantes/">
+                                    <i class="fas fa-user-graduate me-2"></i>Estudiantes
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/views/monitores/">
+                                    <i class="fas fa-users me-2"></i>Monitores
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/views/tutores/">
+                                    <i class="fas fa-user-tie me-2"></i>Tutores
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/views/profesores/">
+                                    <i class="fas fa-chalkboard-teacher me-2"></i>Profesores
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Menú Servicios -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link-custom dropdown-toggle" href="#" id="serviciosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-briefcase me-2"></i>Servicios
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="serviciosDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/views/tutorias/">
+                                    <i class="fas fa-graduation-cap me-2"></i>Tutorías
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/views/monitorias/">
+                                    <i class="fas fa-chalkboard me-2"></i>Monitorías
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Menú Materias -->
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="/views/materias/">
+                            <i class="fas fa-book me-2"></i>Materias
+                        </a>
+                    </li>
+                    
+                    <!-- Menú Facturas -->
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="/views/facturas/">
+                            <i class="fas fa-file-invoice-dollar me-2"></i>Facturas
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Información del Login -->
+                <ul class="navbar-nav ms-3">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link-custom dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-2"></i>
+                            <span sec:authentication="name">Usuario</span>
+                            <span class="role-badge role-admin">ADMIN</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user me-2"></i>
+                                    <span sec:authentication="name"></span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/home">
+                                    <i class="fas fa-home me-2"></i>Panel Principal
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post" style="display: inline;">
+                                    <button type="submit" class="dropdown-item" style="border: none; background: none; width: 100%; text-align: left; padding: 0.5rem 1rem;">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>
+

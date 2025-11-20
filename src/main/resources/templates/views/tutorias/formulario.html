@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Formulario de Tutoría</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/styless.css}" rel="stylesheet" type="text/css">
+    <style>
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 2rem 0;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        .btn-primary:hover {
+            background-color: #5a6fd8;
+            border-color: #5a6fd8;
+        }
+        .estudiante-info {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .is-valid {
+            border-color: #28a745 !important;
+        }
+        .invalid-feedback {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Sistema de Tutorías
+                    </h1>
+                    <p class="mb-0 mt-2" th:text="${titulo}">Formulario de Tutoría</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/home" class="btn btn-outline-light me-2">
+                        <i class="fas fa-home me-2"></i>
+                        Inicio
+                    </a>
+                    <a th:href="@{/views/tutorias/}" class="btn btn-light">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Volver a la Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                <span th:text="${titulo}">Formulario de Tutoría</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="${modo == 'crear' ? '/views/tutorias/save' : '/views/tutorias/update/' + tutoria.idTutoria}" 
+                                  th:object="${tutoria}" 
+                                  method="post"
+                                  id="tutoriaForm">
+                                
+                                <!-- Información del Estudiante -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="fas fa-user-graduate me-2"></i>
+                                            Información del Estudiante
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="idEstudiante" class="form-label">
+                                            ID del Estudiante <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" 
+                                               class="form-control" 
+                                               id="idEstudiante"
+                                               th:field="*{idEstudiante}"
+                                               placeholder="Ingrese el ID del estudiante"
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('idEstudiante')}" 
+                                             th:errors="*{idEstudiante}"></div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            El estudiante debe estar registrado en el sistema
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div id="estudianteInfo" class="estudiante-info">
+                                            <h6 class="mb-2">
+                                                <i class="fas fa-user me-2"></i>
+                                                Información del Estudiante
+                                            </h6>
+                                            <div id="estudianteDetalles"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Información de la Tutoría -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="fas fa-chalkboard-teacher me-2"></i>
+                                            Información de la Tutoría
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="idTutor" class="form-label">
+                                            Profesor/Tutor <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="idTutor" th:field="*{idTutor}" required>
+                                            <option value="">Seleccione un tutor</option>
+                                            <option th:each="tutor : ${tutores}" 
+                                                    th:value="${tutor.idTutor}"
+                                                    th:text="${tutor.nombreProfesor} + ' - ' + ${tutor.areaExpertise}">
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('idTutor')}" 
+                                             th:errors="*{idTutor}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="idMateria" class="form-label">
+                                            Materia <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="idMateria" th:field="*{idMateria}" required>
+                                            <option value="">Seleccione una materia</option>
+                                            <option th:each="materia : ${materias}" 
+                                                    th:value="${materia.idMateria}"
+                                                    th:text="${materia.nombreConCodigo}">
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('idMateria')}" 
+                                             th:errors="*{idMateria}"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Fecha y Duración -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label for="fecha" class="form-label">
+                                            Fecha y Hora <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="datetime-local" 
+                                               class="form-control" 
+                                               id="fecha"
+                                               th:field="*{fecha}"
+                                               th:value="${tutoria.fecha != null ? #temporals.format(tutoria.fecha, 'yyyy-MM-dd\'T\'HH:mm') : ''}"
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fecha')}" 
+                                             th:errors="*{fecha}"></div>
+                                        <div class="form-text">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            Seleccione la fecha y hora para la tutoría
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="duracionHoras" class="form-label">
+                                            Duración (horas) <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" 
+                                               class="form-control" 
+                                               id="duracionHoras"
+                                               th:field="*{duracionHoras}"
+                                               step="0.5" 
+                                               min="0.5" 
+                                               max="8.0"
+                                               placeholder="Ej: 1.5"
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('duracionHoras')}" 
+                                             th:errors="*{duracionHoras}"></div>
+                                        <div class="form-text">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Duración entre 0.5 y 8 horas
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Estado y Observaciones -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label for="estado" class="form-label">
+                                            Estado <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="estado" th:field="*{estado}" required>
+                                            <option value="pendiente">Pendiente</option>
+                                            <option value="realizada">Realizada</option>
+                                            <option value="cancelada">Cancelada</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('estado')}" 
+                                             th:errors="*{estado}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="observaciones" class="form-label">
+                                            Observaciones
+                                        </label>
+                                        <textarea class="form-control" 
+                                                  id="observaciones"
+                                                  th:field="*{observaciones}"
+                                                  rows="3"
+                                                  placeholder="Observaciones adicionales sobre la tutoría"></textarea>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('observaciones')}" 
+                                             th:errors="*{observaciones}"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Botones -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <hr class="my-4">
+                                        <div class="d-flex justify-content-between">
+                                            <a th:href="@{/views/tutorias/}" class="btn btn-secondary">
+                                                <i class="fas fa-times me-2"></i>
+                                                Cancelar
+                                            </a>
+                                            <button type="submit" class="btn btn-primary btn-lg">
+                                                <i class="fas fa-save me-2"></i>
+                                                <span th:text="${modo == 'crear' ? 'Guardar Tutoría' : 'Actualizar Tutoría'}"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Verificar estudiante en tiempo real
+        document.getElementById('idEstudiante').addEventListener('blur', function() {
+            const idEstudiante = this.value;
+            const estudianteInfo = document.getElementById('estudianteInfo');
+            const estudianteDetalles = document.getElementById('estudianteDetalles');
+            
+            if (idEstudiante && idEstudiante.length > 0) {
+                // Verificar si el estudiante existe
+                fetch(`/views/tutorias/api/verificar-estudiante/${idEstudiante}`)
+                    .then(response => response.json())
+                    .then(existe => {
+                        if (existe) {
+                            // Obtener información del estudiante
+                            fetch(`/views/tutorias/api/estudiante/${idEstudiante}`)
+                                .then(response => response.json())
+                                .then(estudiante => {
+                                    if (estudiante) {
+                                        estudianteDetalles.innerHTML = `
+                                            <p class="mb-1"><strong>Nombre:</strong> ${estudiante.nombre} ${estudiante.apellido}</p>
+                                            <p class="mb-1"><strong>Correo:</strong> ${estudiante.correo}</p>
+                                            <p class="mb-0"><strong>Programa:</strong> ${estudiante.programaAcademico || 'No especificado'}</p>
+                                        `;
+                                        estudianteInfo.style.display = 'block';
+                                        document.getElementById('idEstudiante').classList.remove('is-invalid');
+                                        document.getElementById('idEstudiante').classList.add('is-valid');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error al obtener datos del estudiante:', error);
+                                });
+                        } else {
+                            estudianteInfo.style.display = 'none';
+                            document.getElementById('idEstudiante').classList.remove('is-valid');
+                            document.getElementById('idEstudiante').classList.add('is-invalid');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al verificar estudiante:', error);
+                        estudianteInfo.style.display = 'none';
+                    });
+            } else {
+                estudianteInfo.style.display = 'none';
+                document.getElementById('idEstudiante').classList.remove('is-valid', 'is-invalid');
+            }
+        });
+
+        // Establecer fecha mínima como hoy
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInput = document.getElementById('fecha');
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            fechaInput.min = now.toISOString().slice(0, 16);
+        });
+
+        // Validación del formulario
+        document.getElementById('tutoriaForm').addEventListener('submit', function(e) {
+            const idEstudiante = document.getElementById('idEstudiante').value;
+            const idTutor = document.getElementById('idTutor').value;
+            const idMateria = document.getElementById('idMateria').value;
+            const fecha = document.getElementById('fecha').value;
+            const duracion = parseFloat(document.getElementById('duracionHoras').value);
+
+            let isValid = true;
+            let mensajeError = '';
+
+            // Validar campos requeridos
+            if (!idEstudiante) {
+                document.getElementById('idEstudiante').classList.add('is-invalid');
+                isValid = false;
+                mensajeError += '- ID del estudiante es requerido\n';
+            }
+            if (!idTutor) {
+                document.getElementById('idTutor').classList.add('is-invalid');
+                isValid = false;
+                mensajeError += '- Seleccione un tutor\n';
+            }
+            if (!idMateria) {
+                document.getElementById('idMateria').classList.add('is-invalid');
+                isValid = false;
+                mensajeError += '- Seleccione una materia\n';
+            }
+            if (!fecha) {
+                document.getElementById('fecha').classList.add('is-invalid');
+                isValid = false;
+                mensajeError += '- Fecha y hora son requeridas\n';
+            }
+            if (!duracion || duracion < 0.5 || duracion > 8) {
+                document.getElementById('duracionHoras').classList.add('is-invalid');
+                isValid = false;
+                mensajeError += '- Duración debe estar entre 0.5 y 8 horas\n';
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Por favor, corrija los siguientes errores:\n\n' + mensajeError);
+                return false;
+            }
+        });
+
+        // Limpiar validación al escribir
+        document.querySelectorAll('.form-control, .form-select').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
+            
+            input.addEventListener('change', function() {
+                this.classList.remove('is-invalid');
+            });
+        });
+    </script>
+</body>
+</html>

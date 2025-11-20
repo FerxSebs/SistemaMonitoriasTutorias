@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/styless.css}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar('Mi Perfil')}"></div>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Flash Messages -->
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show alert-custom" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Header -->
+        <div class="header-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-0">
+                            <i class="fas fa-user-edit me-2"></i>
+                            Mi Perfil
+                        </h1>
+                        <p class="mb-0 mt-2">Actualice su información personal</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="/home" class="btn btn-light btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <!-- Formulario para Estudiante/Monitor -->
+                    <div th:if="${tipoUsuario == 'estudiante'}">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user-graduate me-2"></i>
+                                    Información Personal
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/perfil/actualizar}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    
+                                    <!-- Campos de solo lectura -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="idEstudiante" class="form-label">ID del Estudiante</label>
+                                            <input type="number" class="form-control" id="idEstudiante" 
+                                                   th:value="${estudiante.idEstudiante}" readonly 
+                                                   style="background-color: #e9ecef; cursor: not-allowed;">
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                El ID no puede ser modificado
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="correo" class="form-label">Correo Electrónico</label>
+                                            <input type="email" class="form-control" id="correo" 
+                                                   th:value="${estudiante.correo}" readonly 
+                                                   style="background-color: #e9ecef; cursor: not-allowed;">
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                El correo no puede ser modificado
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="programaAcademico" class="form-label">Programa Académico</label>
+                                            <input type="text" class="form-control" id="programaAcademico" 
+                                                   th:value="${estudiante.programaAcademico}" readonly 
+                                                   style="background-color: #e9ecef; cursor: not-allowed;">
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                El programa académico no puede ser modificado
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr>
+                                    
+                                    <!-- Campos editables -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="nombre" class="form-label">Nombre *</label>
+                                            <input type="text" class="form-control" id="nombre" 
+                                                   name="nombre" th:value="${estudiante.nombre}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="apellido" class="form-label">Apellido *</label>
+                                            <input type="text" class="form-control" id="apellido" 
+                                                   name="apellido" th:value="${estudiante.apellido}" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="telefono" class="form-label">Teléfono</label>
+                                            <input type="text" class="form-control" id="telefono" 
+                                                   name="telefono" th:value="${estudiante.telefono}" 
+                                                   placeholder="Ej: 3001234567">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="password" class="form-label">Nueva Contraseña</label>
+                                            <input type="password" class="form-control" id="password" 
+                                                   name="password" placeholder="Dejar vacío para mantener la contraseña actual">
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Deje este campo vacío si no desea cambiar la contraseña
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Campos ocultos para mantener los valores no editables -->
+                                    <input type="hidden" name="idEstudiante" th:value="${estudiante.idEstudiante}">
+                                    <input type="hidden" name="correo" th:value="${estudiante.correo}">
+                                    <input type="hidden" name="programaAcademico" th:value="${estudiante.programaAcademico}">
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                        <a href="/home" class="btn btn-secondary me-md-2">
+                                            <i class="fas fa-times me-2"></i>Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Información adicional para Monitor -->
+                        <div th:if="${esMonitor != null && esMonitor}" class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chalkboard-teacher me-2"></i>
+                                    Información de Monitor
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/perfil/actualizar}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="areaExpertise" class="form-label">Área de Expertise *</label>
+                                            <input type="text" class="form-control" id="areaExpertise" 
+                                                   name="areaExpertise" th:value="${monitor.areaExpertise}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="estadoMonitor" class="form-label">Estado *</label>
+                                            <select class="form-select" id="estadoMonitor" name="estado" required>
+                                                <option value="Activo" th:selected="${monitor.estado == 'Activo'}">Activo</option>
+                                                <option value="Inactivo" th:selected="${monitor.estado == 'Inactivo'}">Inactivo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Campos ocultos para mantener la información del estudiante -->
+                                    <input type="hidden" name="nombre" th:value="${estudiante.nombre}">
+                                    <input type="hidden" name="apellido" th:value="${estudiante.apellido}">
+                                    <input type="hidden" name="telefono" th:value="${estudiante.telefono}">
+                                    <input type="hidden" name="idEstudiante" th:value="${estudiante.idEstudiante}">
+                                    <input type="hidden" name="correo" th:value="${estudiante.correo}">
+                                    <input type="hidden" name="programaAcademico" th:value="${estudiante.programaAcademico}">
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Actualizar Información de Monitor
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulario para Profesor/Tutor -->
+                    <div th:if="${tipoUsuario == 'profesor'}">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chalkboard-teacher me-2"></i>
+                                    Información Personal
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/perfil/actualizar}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    
+                                    <!-- Campos de solo lectura -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="idProfesor" class="form-label">ID del Profesor</label>
+                                            <input type="number" class="form-control" id="idProfesor" 
+                                                   th:value="${profesor.idProfesor}" readonly 
+                                                   style="background-color: #e9ecef; cursor: not-allowed;">
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                El ID no puede ser modificado
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="correo" class="form-label">Correo Electrónico</label>
+                                            <input type="email" class="form-control" id="correo" 
+                                                   th:value="${profesor.correo}" readonly 
+                                                   style="background-color: #e9ecef; cursor: not-allowed;">
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                El correo no puede ser modificado
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="departamento" class="form-label">Departamento</label>
+                                            <input type="text" class="form-control" id="departamento" 
+                                                   th:value="${profesor.departamento}" readonly 
+                                                   style="background-color: #e9ecef; cursor: not-allowed;">
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                El departamento no puede ser modificado
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr>
+                                    
+                                    <!-- Campos editables -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="nombre" class="form-label">Nombre *</label>
+                                            <input type="text" class="form-control" id="nombre" 
+                                                   name="nombre" th:value="${profesor.nombre}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="apellido" class="form-label">Apellido *</label>
+                                            <input type="text" class="form-control" id="apellido" 
+                                                   name="apellido" th:value="${profesor.apellido}" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="telefono" class="form-label">Teléfono</label>
+                                            <input type="text" class="form-control" id="telefono" 
+                                                   name="telefono" th:value="${profesor.telefono}" 
+                                                   placeholder="Ej: 3001234567">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="password" class="form-label">Nueva Contraseña</label>
+                                            <input type="password" class="form-control" id="password" 
+                                                   name="password" placeholder="Dejar vacío para mantener la contraseña actual">
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Deje este campo vacío si no desea cambiar la contraseña
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Campos ocultos para mantener los valores no editables -->
+                                    <input type="hidden" name="idProfesor" th:value="${profesor.idProfesor}">
+                                    <input type="hidden" name="correo" th:value="${profesor.correo}">
+                                    <input type="hidden" name="departamento" th:value="${profesor.departamento}">
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                        <a href="/home" class="btn btn-secondary me-md-2">
+                                            <i class="fas fa-times me-2"></i>Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Información adicional para Tutor -->
+                        <div th:if="${esTutor != null && esTutor}" class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user-tie me-2"></i>
+                                    Información de Tutor
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/perfil/actualizar}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <label for="areaExpertise" class="form-label">Área de Expertise *</label>
+                                            <input type="text" class="form-control" id="areaExpertise" 
+                                                   name="areaExpertise" th:value="${tutor.areaExpertise}" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Campos ocultos para mantener la información del profesor -->
+                                    <input type="hidden" name="nombre" th:value="${profesor.nombre}">
+                                    <input type="hidden" name="apellido" th:value="${profesor.apellido}">
+                                    <input type="hidden" name="telefono" th:value="${profesor.telefono}">
+                                    <input type="hidden" name="idProfesor" th:value="${profesor.idProfesor}">
+                                    <input type="hidden" name="correo" th:value="${profesor.correo}">
+                                    <input type="hidden" name="departamento" th:value="${profesor.departamento}">
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Actualizar Información de Tutor
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
+
